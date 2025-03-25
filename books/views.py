@@ -4,6 +4,11 @@ from django.urls import reverse_lazy
 from django.views import View
 from .models import Book
 from .forms import BookForm
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.generics import ListAPIView, CreateAPIView, DestroyAPIView
+from .serializer import BookSerializer
+
+
 
 class BookListView(View):
     template_name = 'books/book_list.html'
@@ -15,6 +20,20 @@ class BookListView(View):
         else:
             books = Book.objects.all()
         return render(request, self.template_name, {'books': books})
+
+
+class BookAPIListView(ListAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+
+class BookAPICreateView(CreateAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+
+class BookAPIDeleteView(DestroyAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    permission_classes = [IsAuthenticated]
 
 class BookDetailView(View):
     template_name = 'books/book_detail.html'
@@ -67,3 +86,5 @@ class BookDeleteView(View):
         book = get_object_or_404(Book, pk=pk)
         book.delete()
         return redirect(self.success_url)
+
+
